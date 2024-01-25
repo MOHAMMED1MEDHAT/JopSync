@@ -106,6 +106,14 @@ describe('app e2e', () => {
 	});
 
 	describe('Jobs', () => {
+		const jobDto = {
+			position: 'Software Engineer',
+			company: 'Google',
+			jobLocation: 'Cairo',
+			status: 'PENDING',
+			type: 'FULL_TIME',
+		};
+
 		describe('POST /jobs', () => {
 			it('should create the job', () => {
 				return pactum
@@ -114,74 +122,63 @@ describe('app e2e', () => {
 					.withHeaders({
 						Authorization: 'Bearer $S{userAt}',
 					})
-					.withBody({
-						position: 'Software Engineer',
-						company: 'Google',
-						jobLocation: 'Cairo',
-						status: 'PENDING',
-						type: 'FULL_TIME',
-					})
+					.withBody(jobDto)
 					.expectStatus(201)
 					.stores('jobId', 'data.job.id');
 			});
 
 			it('should FAIL create a job cause the user is not authenticated', () => {
-				return pactum
-					.spec()
-					.post('/jobs')
-					.withBody({
-						position: 'Software Engineer',
-						company: 'Google',
-						jobLocation: 'Cairo',
-						status: 'PENDING',
-						type: 'FULL_TIME',
-					})
-					.expectStatus(401);
+				return pactum.spec().post('/jobs').withBody(jobDto).expectStatus(401);
 			});
 		});
 
 		describe('PATCH /jobs/:id', () => {
-			it.skip("should FAIL update the user's info by it's id if the id does not exists", () => {
+			it("should FAIL update the job's info by it's id if the id does not exists", () => {
 				return pactum
 					.spec()
-					.patch('/users/1')
+					.patch('/jobs/1weqrfdsas')
 					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
+						Authorization: 'Bearer $S{userAt}',
 					})
-					.withBody({
-						email: 'mohammedmedhat2121@gmail.com',
-						firstName: 'mohammed',
-						lastName: 'medhat',
-					})
-					.expectStatus(406);
+					.withBody(jobDto)
+					.expectStatus(404);
 			});
 
-			it.skip("should update the user's info by it's id and return the updated user info", () => {
+			it("should update the job's info by it's id and return the updated job", () => {
 				return pactum
 					.spec()
-					.patch('/users/$S{userId}')
+					.patch('/jobs/$S{jobId}')
 					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
+						Authorization: 'Bearer $S{userAt}',
 					})
 					.withBody({
-						email: 'mohammedmedhat2121@gmail.com',
-						firstName: 'mohammed',
-						lastName: 'medhat',
+						position: 'Software Engineer',
+						company: 'Facebook',
+						jobLocation: 'Cairo',
+						status: 'PENDING',
+						type: 'FULL_TIME',
 					})
 					.expectStatus(200);
 			});
 
-			it.skip("should FAIL update the user's info by it's id if not admin", () => {
+			it("should FAIL update the job's info by it's id if authenticated", () => {
 				return pactum
 					.spec()
-					.patch('/users/$S{userId}')
-					.withBody({
-						email: 'mohammedmedhat2121@gmail.com',
-						firstName: 'mohammed',
-						lastName: 'medhat',
-					})
+					.patch('/jobs/$S{jobId}')
+					.withBody(jobDto)
 					.expectStatus(401);
-				// .expectStatus(403);
+			});
+
+			it("should FAIL update the job's info by it's id if the body is not valid", () => {
+				return pactum
+					.spec()
+					.patch('/jobs/$S{jobId}')
+					.withBearerToken('$S{userAt}')
+					.withBody({
+						position: 'Software Engineer',
+						company: 'Facebook',
+					})
+					.expectStatus(400);
 			});
 		});
 
@@ -223,38 +220,23 @@ describe('app e2e', () => {
 					})
 					.expectStatus(200);
 			});
+		});
 
-			describe('DELETE /users/:id', () => {
-				it.skip("should FAIL delete the user's info by it's id if not admin", () => {
-					return pactum
-						.spec()
-						.delete('/users/$S{userId}')
-						.withHeaders({ Authorization: 'Bearer $S{uaserAt}' })
-						.expectStatus(401);
-					// .expectStatus(403);
-				});
-
-				it.skip("should delete the user's info by it's id and return the deleted user info if admin", () => {
-					return pactum
-						.spec()
-						.delete('/users/$S{userId}')
-						.withHeaders({ Authorization: 'Bearer $S{adminAt}' })
-						.expectStatus(200);
-				});
+		describe('DELETE /jobs/:id', () => {
+			it("should FAIL delete the job's info by it's id if not authenticated", () => {
+				return pactum.spec().delete('/jobs/$S{jobId}').expectStatus(401);
 			});
 
-			describe('DELETE /users/me', () => {
-				it.skip("should FAIL delete the user's info if user is not authenticated", () => {
-					return pactum.spec().delete('/users/me').expectStatus(401);
-				});
+			it("should FAIL delete the job's info by it's id if the id is invalid", () => {
+				return pactum.spec().delete('/jobs/1weqrfdsas').expectStatus(404);
+			});
 
-				it.skip("should delete the user's info if user is authenticated", () => {
-					return pactum
-						.spec()
-						.delete('/users/me')
-						.withHeaders({ Authorization: 'Bearer $S{adminAt}' })
-						.expectStatus(200);
-				});
+			it("should delete the job's info by it's id", () => {
+				return pactum
+					.spec()
+					.delete('/jobs/$S{userId}')
+					.withHeaders({ Authorization: 'Bearer $S{userAt}' })
+					.expectStatus(200);
 			});
 		});
 	});

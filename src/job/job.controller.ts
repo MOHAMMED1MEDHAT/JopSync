@@ -2,10 +2,10 @@ import {
 	Body,
 	Controller,
 	Get,
-	ParseIntPipe,
 	Post,
 	Param,
 	UseGuards,
+	Patch,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { ResponseObj } from '../auth/dto/responseObj.dto';
@@ -39,6 +39,14 @@ export class JobController {
 	): Promise<ResponseObj> {
 		return await this.jobService.createJob(jobDto, user.id);
 	}
-	// async updateJob(): Promise<ResponseObj> {}
+
+	@Patch('/:id')
+	async updateJob(
+		@Param('id') id: string,
+		@GetUser() user: User,
+		@Body() jobDto: JobDto,
+	): Promise<ResponseObj> {
+		return await this.jobService.updateJob(id, user.id, jobDto);
+	}
 	// async deleteJob(): Promise<ResponseObj> {}
 }

@@ -6,7 +6,23 @@ import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class JobService {
-	constructor(private pirsmaService: PrismaService) {}
+	private readonly statusMap: Record<string, $Enums.Status>;
+	private readonly typeMap: Record<string, $Enums.Type>;
+	constructor(private pirsmaService: PrismaService) {
+		this.statusMap = {
+			DECLINED: $Enums.Status.DECLINED,
+			INTERVIEW: $Enums.Status.INTERVIEW,
+			PENDING: $Enums.Status.PENDING,
+		};
+
+		this.typeMap = {
+			FULL_TIME: $Enums.Type.FULLTIME,
+			PART_TIME: $Enums.Type.PARTTIME,
+			INTERNSHIP: $Enums.Type.INTERNSHIP,
+			REMOTE: $Enums.Type.REMOTE,
+		};
+	}
+
 	async getAllJobs(userId?: string): Promise<ResponseObj> {
 		const jobs = await this.pirsmaService.job.findMany({
 			where: {
@@ -35,21 +51,9 @@ export class JobService {
 
 	async createJob(jobDto: JobDto, userId: string): Promise<ResponseObj> {
 		const { position, jobLocation, status, type, company } = jobDto;
-		const statusMap = {
-			DECLINED: $Enums.Status.DECLINED,
-			INTERVIEW: $Enums.Status.INTERVIEW,
-			PENDING: $Enums.Status.PENDING,
-		};
 
-		const typeMap = {
-			FULL_TIME: $Enums.Type.FULLTIME,
-			PART_TIME: $Enums.Type.PARTTIME,
-			INTERNSHIP: $Enums.Type.INTERNSHIP,
-			REMOTE: $Enums.Type.REMOTE,
-		};
-
-		const jobStatus = statusMap[status] || $Enums.Status.PENDING;
-		const jobType = typeMap[type] || $Enums.Type.REMOTE;
+		const jobStatus = this.statusMap[status] || $Enums.Status.PENDING;
+		const jobType = this.typeMap[type] || $Enums.Type.REMOTE;
 
 		const job = await this.pirsmaService.job.create({
 			data: {
@@ -63,5 +67,37 @@ export class JobService {
 		});
 
 		return { message: 'job created successfully', data: { job } };
+	}
+
+	async updateJob(jobId: string, userId: string, jobDto): Promise<ResponseObj> {
+		const isJob = await this.pirsmaService.job.findUnique({
+			where: {
+				id: jobId,
+				userId,
+			},
+		});
+
+		if (!isJob) throw new HttpException('NOT FOUND', HttpStatus.NOT_FOUND);
+
+		const { position, jobLocation, status, type, company } = jobDto;
+
+		const jobStatus = this.statusMap[status] || $Enums.Status.PENDING;
+		const jobType = this.typeMap[type] || $Enums.Type.REMOTE;
+
+		const job = await this.pirsmaService.job.update({
+			where: {
+				id: jobId,
+				userId,
+			},
+			data: {
+				position,
+				jobLocation,
+				company,
+				status: jobStatus,
+				type: jobType,
+			},
+		});
+
+		return { message: 'job updated successfully', data: { job } };
 	}
 }
