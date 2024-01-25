@@ -103,6 +103,32 @@ describe('app e2e', () => {
 					.stores('userId', 'data.user.id');
 			});
 		});
+
+		describe('POST /auth/logout', () => {
+			it('should logout', () => {
+				return pactum
+					.spec()
+					.post('/auth/logout')
+					.withBearerToken('$S{userAt}')
+					.expectStatus(200);
+			});
+
+			it('should FAIL to logout if not authenticated', () => {
+				return pactum.spec().post('/auth/logout').expectStatus(401);
+			});
+		});
+
+		describe('Auth again after changes', () => {
+			it('should login again after the user is updated', () => {
+				return pactum
+					.spec()
+					.post('/auth/login')
+					.withBody(userDto)
+					.expectStatus(200)
+					.stores('userAt', 'data.token')
+					.stores('userId', 'data.user.id');
+			});
+		});
 	});
 
 	describe('Jobs', () => {
@@ -370,20 +396,6 @@ describe('app e2e', () => {
 					.withHeaders({ Authorization: 'Bearer $S{userAt}' })
 					.expectStatus(200);
 			});
-		});
-	});
-
-	describe('Auth (logout)', () => {
-		it('should FAIL to logout if not authenticated', () => {
-			return pactum.spec().post('/auth/logout').expectStatus(401);
-		});
-
-		it('should logout', () => {
-			return pactum
-				.spec()
-				.post('/auth/logout')
-				.withBearerToken('$S{userAt}')
-				.expectStatus(200);
 		});
 	});
 });

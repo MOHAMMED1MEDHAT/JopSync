@@ -67,6 +67,13 @@ export class AuthService {
 		};
 	}
 
+	async logout(user: User): Promise<ResponseObj> {
+		return {
+			message: 'LoggedOut Successfully',
+			data: { user },
+		};
+	}
+
 	async generateAccessToken(user: User): Promise<{ token: string }> {
 		const payload = { email: user.email, sub: user.id };
 
