@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ResponseObj } from '../auth/dto/responseObj.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { JobDto } from './dto/job.dto';
-import { JobStatus, JobType } from './enums';
 import { $Enums } from '@prisma/client';
 
 @Injectable()
@@ -21,10 +20,11 @@ export class JobService {
 		return { message: 'all jobs', data: { jobs } };
 	}
 
-	async getJobById(jobId: string): Promise<ResponseObj> {
+	async getJobById(jobId: string, userId: string): Promise<ResponseObj> {
 		const job = await this.pirsmaService.job.findUnique({
 			where: {
 				id: jobId,
+				userId,
 			},
 		});
 
@@ -34,31 +34,30 @@ export class JobService {
 	}
 
 	async createJob(jobDto: JobDto, userId: string): Promise<ResponseObj> {
-		const { position, jobLocation, jobStatus, jobType, company } = jobDto;
-
+		const { position, jobLocation, status, type, company } = jobDto;
 		const statusMap = {
-			[JobStatus.DECLINED]: $Enums.Status.DECLINED,
-			[JobStatus.INTERVIEW]: $Enums.Status.INTERVIEW,
-			[JobStatus.PENDING]: $Enums.Status.PENDING,
+			DECLINED: $Enums.Status.DECLINED,
+			INTERVIEW: $Enums.Status.INTERVIEW,
+			PENDING: $Enums.Status.PENDING,
 		};
 
-		const jobTypeMap = {
-			[JobType.REMOTE]: $Enums.Type.REMOTE,
-			[JobType.INTERNSHIP]: $Enums.Type.INTERNSHIP,
-			[JobType.FULL_TIME]: $Enums.Type.FULLTIME,
-			[JobType.PART_TIME]: $Enums.Type.PARTTIME,
+		const typeMap = {
+			FULL_TIME: $Enums.Type.FULLTIME,
+			PART_TIME: $Enums.Type.PARTTIME,
+			INTERNSHIP: $Enums.Type.INTERNSHIP,
+			REMOTE: $Enums.Type.REMOTE,
 		};
 
-		const type = jobTypeMap[jobType];
-		const status = statusMap[jobStatus];
+		const jobStatus = statusMap[status] || $Enums.Status.PENDING;
+		const jobType = typeMap[type] || $Enums.Type.REMOTE;
 
 		const job = await this.pirsmaService.job.create({
 			data: {
 				position,
 				jobLocation,
 				company,
-				status,
-				type,
+				status: jobStatus,
+				type: jobType,
 				userId,
 			},
 		});

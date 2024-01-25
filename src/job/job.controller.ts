@@ -7,10 +7,10 @@ import {
 	Param,
 	UseGuards,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { ResponseObj } from '../auth/dto/responseObj.dto';
 import { JobService } from './job.service';
 import { GetUser } from '../auth/decorator';
-import { User } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guard';
 import { JobDto } from './dto/job.dto';
 
@@ -26,9 +26,10 @@ export class JobController {
 
 	@Get('/:id')
 	async getJobById(
-		@Param('id', ParseIntPipe) id: string,
+		@Param('id') id: string,
+		@GetUser() user: User,
 	): Promise<ResponseObj> {
-		return await this.jobService.getJobById(id);
+		return await this.jobService.getJobById(id, user.id);
 	}
 
 	@Post()

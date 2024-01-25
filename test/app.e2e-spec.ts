@@ -121,8 +121,7 @@ describe('app e2e', () => {
 						status: 'PENDING',
 						type: 'FULL_TIME',
 					})
-					.expectStatus(200)
-					.inspect()
+					.expectStatus(201)
 					.stores('jobId', 'data.job.id');
 			});
 
@@ -191,42 +190,36 @@ describe('app e2e', () => {
 				return pactum.spec().get('/jobs').expectStatus(401);
 			});
 
-			it('should return no content', () => {
+			it('should return all jobs', () => {
 				return pactum
 					.spec()
 					.get('/jobs')
 					.withBearerToken('$S{userAt}')
-					.expectStatus(204);
+					.expectStatus(200);
 			});
 		});
 
 		describe('GET /jobs/:id', () => {
-			it.skip("should FAIL return the user's info by it's id if not admin", () => {
+			it('should FAIL return the job info if not authenticated', () => {
+				return pactum.spec().get('/jobs/$S{jobId}').expectStatus(401);
+			});
+
+			it('should return not found id', () => {
 				return pactum
 					.spec()
-					.get('/jobs/1')
+					.get('/jobs/1weqrfdsas')
 					.withHeaders({
 						Authorization: 'Bearer $S{userAt}',
 					})
-					.expectStatus(403);
+					.expectStatus(404);
 			});
 
-			it.skip('should return not acceptable id', () => {
+			it("should return job info by it's id", () => {
 				return pactum
 					.spec()
-					.get('/jobs/1')
+					.get('/jobs/$S{jobId}')
 					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
-					})
-					.expectStatus(406);
-			});
-
-			it.skip("should return the user's info by it's id", () => {
-				return pactum
-					.spec()
-					.get('/users/$S{userId}')
-					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
+						Authorization: 'Bearer $S{userAt}',
 					})
 					.expectStatus(200);
 			});
@@ -262,22 +255,6 @@ describe('app e2e', () => {
 						.withHeaders({ Authorization: 'Bearer $S{adminAt}' })
 						.expectStatus(200);
 				});
-			});
-		});
-
-		describe('GET /users/me', () => {
-			it.skip('should return the user profile', () => {
-				return pactum
-					.spec()
-					.get('/users/me')
-					.withHeaders({
-						Authorization: 'Bearer $S{userAt}',
-					})
-					.expectStatus(200);
-			});
-
-			it.skip('should FAIL return the user profile if not authenticated', () => {
-				return pactum.spec().get('/users/me').expectStatus(401);
 			});
 		});
 	});

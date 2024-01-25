@@ -1,5 +1,4 @@
-import { IsEnum, IsString } from 'class-validator';
-import { JobStatus, JobType } from '../enums';
+import { IsString } from 'class-validator';
 
 export class JobDto {
 	@IsString()
@@ -11,9 +10,9 @@ export class JobDto {
 	@IsString()
 	jobLocation: string;
 
-	@IsEnum(JobType)
-	jobType: JobType;
+	@IsString()
+	type: string;
 
-	@IsEnum(JobStatus)
-	jobStatus: JobStatus;
+	@IsString()
+	status: string;
 }
