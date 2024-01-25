@@ -6,6 +6,7 @@ import {
 	Param,
 	UseGuards,
 	Patch,
+	Delete,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { ResponseObj } from '../auth/dto/responseObj.dto';
@@ -48,5 +49,12 @@ export class JobController {
 	): Promise<ResponseObj> {
 		return await this.jobService.updateJob(id, user.id, jobDto);
 	}
-	// async deleteJob(): Promise<ResponseObj> {}
+
+	@Delete('/:id')
+	async deleteJob(
+		@Param('id') id: string,
+		@GetUser() user: User,
+	): Promise<ResponseObj> {
+		return await this.jobService.deleteJob(id, user.id);
+	}
 }

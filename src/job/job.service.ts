@@ -100,4 +100,24 @@ export class JobService {
 
 		return { message: 'job updated successfully', data: { job } };
 	}
+
+	async deleteJob(jobId: string, userId: string): Promise<ResponseObj> {
+		const isJob = await this.pirsmaService.job.findUnique({
+			where: {
+				id: jobId,
+				userId,
+			},
+		});
+
+		if (!isJob) throw new HttpException('NOT FOUND', HttpStatus.NOT_FOUND);
+
+		const job = await this.pirsmaService.job.delete({
+			where: {
+				id: jobId,
+				userId,
+			},
+		});
+
+		return { message: 'job deleted successfully', data: { job } };
+	}
 }

@@ -228,13 +228,17 @@ describe('app e2e', () => {
 			});
 
 			it("should FAIL delete the job's info by it's id if the id is invalid", () => {
-				return pactum.spec().delete('/jobs/1weqrfdsas').expectStatus(404);
+				return pactum
+					.spec()
+					.delete('/jobs/1weqrfdsas')
+					.withBearerToken('$S{userAt}')
+					.expectStatus(404);
 			});
 
 			it("should delete the job's info by it's id", () => {
 				return pactum
 					.spec()
-					.delete('/jobs/$S{userId}')
+					.delete('/jobs/$S{jobId}')
 					.withHeaders({ Authorization: 'Bearer $S{userAt}' })
 					.expectStatus(200);
 			});
@@ -444,6 +448,20 @@ describe('app e2e', () => {
 					.withHeaders({ Authorization: 'Bearer $S{adminAt}' })
 					.expectStatus(200);
 			});
+		});
+	});
+
+	describe('Auth (logout)', () => {
+		it.skip('should FAIL to logout if not authenticated', () => {
+			return pactum.spec().post('/auth/logout').expectStatus(401);
+		});
+
+		it.skip('should logout', () => {
+			return pactum
+				.spec()
+				.post('/auth/logout')
+				.withBearerToken('$S{userAt}')
+				.expectStatus(200);
 		});
 	});
 });
