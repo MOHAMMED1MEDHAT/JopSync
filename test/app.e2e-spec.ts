@@ -246,62 +246,8 @@ describe('app e2e', () => {
 	});
 
 	describe('User', () => {
-		describe('GET /users', () => {
-			it.skip('should fail to return all users', () => {
-				return pactum
-					.spec()
-					.get('/users')
-					.withHeaders({
-						Authorization: 'Bearer $S{userAt}',
-					})
-					.expectStatus(403);
-			});
-
-			it.skip('should return all users if admin', () => {
-				return pactum
-					.spec()
-					.get('/users')
-					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
-					})
-					.expectStatus(200);
-			});
-		});
-
-		describe('GET /users/:id', () => {
-			it.skip("should FAIL return the user's info by it's id if not admin", () => {
-				return pactum
-					.spec()
-					.get('/users/1')
-					.withHeaders({
-						Authorization: 'Bearer $S{userAt}',
-					})
-					.expectStatus(403);
-			});
-
-			it.skip('should return not acceptable id', () => {
-				return pactum
-					.spec()
-					.get('/users/1')
-					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
-					})
-					.expectStatus(406);
-			});
-
-			it.skip("should return the user's info by it's id", () => {
-				return pactum
-					.spec()
-					.get('/users/$S{userId}')
-					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
-					})
-					.expectStatus(200);
-			});
-		});
-
 		describe('GET /users/me', () => {
-			it.skip('should return the user profile', () => {
+			it('should return the user profile', () => {
 				return pactum
 					.spec()
 					.get('/users/me')
@@ -311,13 +257,13 @@ describe('app e2e', () => {
 					.expectStatus(200);
 			});
 
-			it.skip('should FAIL return the user profile if not authenticated', () => {
+			it('should FAIL return the user profile if not authenticated', () => {
 				return pactum.spec().get('/users/me').expectStatus(401);
 			});
 		});
 
 		describe('PATCH /users/me/password', () => {
-			it.skip("should update the user's password by if authenticated", () => {
+			it("should update the user's password by if authenticated", () => {
 				return pactum
 					.spec()
 					.patch('/users/me/password')
@@ -331,7 +277,7 @@ describe('app e2e', () => {
 					.expectStatus(200);
 			});
 
-			it.skip("should FAIL update the user's password if not authenticated", () => {
+			it("should FAIL update the user's password if not authenticated", () => {
 				return pactum
 					.spec()
 					.patch('/users/me/password')
@@ -344,7 +290,20 @@ describe('app e2e', () => {
 		});
 
 		describe('PATCH /users/me', () => {
-			it.skip("should FAIL update the user's info if not authenticated", () => {
+			it("should FAIL update the user's info if not authenticated", () => {
+				return pactum
+					.spec()
+					.patch('/users/me')
+					.withBody({
+						email: 'mohammedmedhat2121@gmail.com',
+						firstName: 'mohammed',
+						lastName: 'medhat',
+						location: 'Cairo',
+					})
+					.expectStatus(401);
+			});
+
+			it("should FAIL update the user's info if the body is invalid", () => {
 				return pactum
 					.spec()
 					.patch('/users/me')
@@ -356,7 +315,7 @@ describe('app e2e', () => {
 					.expectStatus(401);
 			});
 
-			it.skip("should update the user's info by if authenticated", () => {
+			it("should update the user's info by if authenticated", () => {
 				return pactum
 					.spec()
 					.patch('/users/me')
@@ -367,96 +326,59 @@ describe('app e2e', () => {
 						email: 'mohammedmedhat2121@gmail.com',
 						firstName: 'mohammed',
 						lastName: 'medhat',
+						location: 'Cairo',
 					})
 					.expectStatus(200);
 			});
 		});
 
-		describe('PATCH /users/:id', () => {
-			it.skip("should FAIL update the user's info by it's id if the id does not exists", () => {
+		describe('Auth again after changes', () => {
+			it('should FAIL login again after the user is updated', () => {
 				return pactum
 					.spec()
-					.patch('/users/1')
-					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
+					.post('/auth/login')
+					.withBody({
+						email: 'mohammedmedhat2121',
+						password: '123456789',
 					})
+					.expectStatus(400);
+			});
+
+			it('should login again after the user is updated', () => {
+				return pactum
+					.spec()
+					.post('/auth/login')
 					.withBody({
 						email: 'mohammedmedhat2121@gmail.com',
-						firstName: 'mohammed',
-						lastName: 'medhat',
+						password: '123456789',
 					})
-					.expectStatus(406);
-			});
-
-			it.skip("should update the user's info by it's id and return the updated user info", () => {
-				return pactum
-					.spec()
-					.patch('/users/$S{userId}')
-					.withHeaders({
-						Authorization: 'Bearer $S{adminAt}',
-					})
-					.withBody({
-						email: 'mohammedmedhat2121@gmail.com',
-						firstName: 'mohammed',
-						lastName: 'medhat',
-					})
-					.expectStatus(200);
-			});
-
-			it.skip("should FAIL update the user's info by it's id if not admin", () => {
-				return pactum
-					.spec()
-					.patch('/users/$S{userId}')
-					.withBody({
-						email: 'mohammedmedhat2121@gmail.com',
-						firstName: 'mohammed',
-						lastName: 'medhat',
-					})
-					.expectStatus(401);
-				// .expectStatus(403);
-			});
-		});
-
-		describe('DELETE /users/:id', () => {
-			it.skip("should FAIL delete the user's info by it's id if not admin", () => {
-				return pactum
-					.spec()
-					.delete('/users/$S{userId}')
-					.withHeaders({ Authorization: 'Bearer $S{uaserAt}' })
-					.expectStatus(401);
-				// .expectStatus(403);
-			});
-
-			it.skip("should delete the user's info by it's id and return the deleted user info if admin", () => {
-				return pactum
-					.spec()
-					.delete('/users/$S{userId}')
-					.withHeaders({ Authorization: 'Bearer $S{adminAt}' })
-					.expectStatus(200);
+					.expectStatus(200)
+					.stores('userAt', 'data.token')
+					.stores('userId', 'data.user.id');
 			});
 		});
 
 		describe('DELETE /users/me', () => {
-			it.skip("should FAIL delete the user's info if user is not authenticated", () => {
+			it("should FAIL delete the user's info if user is not authenticated", () => {
 				return pactum.spec().delete('/users/me').expectStatus(401);
 			});
 
-			it.skip("should delete the user's info if user is authenticated", () => {
+			it("should delete the user's info if user is authenticated", () => {
 				return pactum
 					.spec()
 					.delete('/users/me')
-					.withHeaders({ Authorization: 'Bearer $S{adminAt}' })
+					.withHeaders({ Authorization: 'Bearer $S{userAt}' })
 					.expectStatus(200);
 			});
 		});
 	});
 
 	describe('Auth (logout)', () => {
-		it.skip('should FAIL to logout if not authenticated', () => {
+		it('should FAIL to logout if not authenticated', () => {
 			return pactum.spec().post('/auth/logout').expectStatus(401);
 		});
 
-		it.skip('should logout', () => {
+		it('should logout', () => {
 			return pactum
 				.spec()
 				.post('/auth/logout')

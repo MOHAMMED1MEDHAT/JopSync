@@ -13,8 +13,8 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  fistname      String?
-  lastname      String?
+  firstName      String?
+  lastName      String?
   hash  String
   location  String?
   createdAt DateTime @default(now())
