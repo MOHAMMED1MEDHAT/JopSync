@@ -41,33 +41,66 @@ describe('app e2e', () => {
 			password: '12345678',
 		};
 
-		describe('POST /auth/signup (user)', () => {
-			it.skip('should fail to signup', () => {
+		describe('POST /auth/register (user)', () => {
+			it('should FAIL to register because of the invalid body', () => {
 				return pactum
 					.spec()
-					.post('/auth/signup')
+					.post('/auth/register')
 					.withBody({ email: userDto.email })
 					.expectStatus(400);
 			});
 
-			it.skip('should signup', () => {
+			it('should register', () => {
 				return pactum
 					.spec()
-					.post('/auth/signup')
+					.post('/auth/register')
 					.withBody(userDto)
 					.expectStatus(201);
 			});
-		});
 
-		describe('POST /auth/signin (user)', () => {
-			it.skip('should login', () => {
+			it('should FAIL register because of the user already exists', () => {
 				return pactum
 					.spec()
-					.post('/auth/signin')
+					.post('/auth/register')
+					.withBody(userDto)
+					.expectStatus(400);
+			});
+		});
+
+		describe('POST /auth/login (user)', () => {
+			it('should FAIL to login because of the invalid body', () => {
+				return pactum
+					.spec()
+					.post('/auth/login')
+					.withBody({
+						email: userDto.email,
+					})
+					.expectStatus(400);
+			});
+
+			it('should FAIL to login because of the incorrect password', () => {
+				return pactum
+					.spec()
+					.post('/auth/login')
+					.withBody({
+						email: userDto.email,
+						password: '12345',
+					})
+					.expectBody({
+						message: 'Invalid credintials',
+						error: 'Bad Request',
+						statusCode: 400,
+					})
+					.expectStatus(400);
+			});
+			it('should login', () => {
+				return pactum
+					.spec()
+					.post('/auth/login')
 					.withBody(userDto)
 					.expectStatus(200)
-					.stores('userAt', 'token')
-					.stores('userId', 'data.id');
+					.stores('userAt', 'data.token')
+					.stores('userId', 'data.user.id');
 			});
 		});
 	});
