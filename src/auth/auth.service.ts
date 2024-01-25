@@ -57,7 +57,7 @@ export class AuthService {
 			user.hash,
 		);
 
-		if (!isPassValid) throw new BadRequestException('Invalid credintials');
+		if (!isPassValid) throw new BadRequestException('Invalid Credentials');
 
 		delete user.hash;
 
