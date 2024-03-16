@@ -1,12 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { BadRequestException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from './../prisma/prisma.service';
-import { AuthDto } from './dto';
-import { ResponseObj } from './dto/responseObj.dto';
-import { JwtService } from '@nestjs/jwt';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { Prisma, User } from '@prisma/client';
+import { PrismaService } from './../prisma/prisma.service';
+import { AuthDto } from './dtos';
+import { ResponseObj } from './dtos/responseObj.dto';
 
 @Injectable()
 export class AuthService {
@@ -74,7 +72,7 @@ export class AuthService {
 		};
 	}
 
-	async generateAccessToken(user: User): Promise<{ token: string }> {
+	private async generateAccessToken(user: User): Promise<{ token: string }> {
 		const payload = { email: user.email, sub: user.id };
 
 		const token = await this.jwt.sign(payload, {

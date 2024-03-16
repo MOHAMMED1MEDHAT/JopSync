@@ -1,19 +1,19 @@
 import {
-	Body,
-	Controller,
-	Get,
-	Post,
-	Param,
-	UseGuards,
-	Patch,
-	Delete,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { ResponseObj } from '../auth/dto/responseObj.dto';
-import { JobService } from './job.service';
-import { GetUser } from '../auth/decorator';
-import { JwtAuthGuard } from '../auth/guard';
+import { GetUser } from '../auth/decorators';
+import { ResponseObj } from '../auth/dtos/responseObj.dto';
+import { JwtAuthGuard } from '../auth/guards';
 import { JobDto } from './dto/job.dto';
+import { JobService } from './job.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('jobs')

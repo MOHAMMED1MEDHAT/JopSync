@@ -6,12 +6,12 @@ import {
 	Post,
 	UseGuards,
 } from '@nestjs/common';
-import { AuthDto } from './dto';
-import { AuthService } from './auth.service';
-import { ResponseObj } from './dto/responseObj.dto';
-import { GetUser } from './decorator';
-import { JwtAuthGuard } from './guard';
 import { User } from '@prisma/client';
+import { AuthService } from './auth.service';
+import { GetUser } from './decorators';
+import { AuthDto } from './dtos';
+import { ResponseObj } from './dtos/responseObj.dto';
+import { JwtAuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthController {

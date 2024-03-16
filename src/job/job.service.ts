@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ResponseObj } from '../auth/dto/responseObj.dto';
+import { $Enums } from '@prisma/client';
+import { ResponseObj } from '../auth/dtos/responseObj.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { JobDto } from './dto/job.dto';
-import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class JobService {

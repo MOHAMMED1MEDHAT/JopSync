@@ -9,10 +9,10 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetUser } from '../auth/decorator';
-import { UserService } from './user.service';
+import { GetUser } from '../auth/decorators';
+import { JwtAuthGuard } from '../auth/guards';
 import { UpdatePasswordDto, UpdateUserDto } from './dto';
-import { JwtAuthGuard } from '../auth/guard';
+import { UserService } from './user.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
